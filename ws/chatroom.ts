@@ -5,6 +5,18 @@ import {
 
 const uuidToWS = new Map<string, WebSocket>();
 
+interface BroadcastObj {
+  name: string;
+  msg: string;
+}
+
+// to broadcast events to all clients
+const broadcastEvent = (obj: BroadcastObj) => {
+  uuidToWS.forEach((ws: WebSocket) => {
+    ws.send(JSON.stringify(obj));
+  });
+};
+
 const chatConnection = async (ws: WebSocket) => {
   // to add new websocket connection to the map
   const uuid = crypto.randomUUID();
@@ -21,7 +33,7 @@ const chatConnection = async (ws: WebSocket) => {
     // to create the event object if the event is of type string
     if (typeof ev === "string") {
       let evObj = JSON.parse(ev);
-      console.log(evObj);
+      broadcastEvent(evObj);
     }
   }
 };
