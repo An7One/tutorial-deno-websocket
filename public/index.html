@@ -88,7 +88,7 @@
         <button>Enter Chat</button>
       </form>
 
-      <div class="chatroom hidden">
+      <div class="chat-room hidden">
         <ul class="chat-list">
           <li>
             <div class="name">yoshi</div>
@@ -109,6 +109,31 @@
     <script>
       // new websocket connection
       let ws = new WebSocket("ws://localhost:3000/ws");
+
+      // references to DOMs
+      const nameForm = document.querySelector(".name-form");
+      const chatRoom = document.querySelector(".chat-room");
+      const chatList = document.querySelector(".chat-list");
+      const chatForm = document.querySelector(".chat-form");
+
+      // name
+      let name = "anon";
+
+      // to enter the chat room with a name
+      nameForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        name = nameForm.nickname.value;
+        nameForm.classList.add("hidden");
+        chatRoom.classList.remove("hidden");
+      });
+
+      // to send a new chat message
+      chatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const msg = chatForm.msg.value;
+        ws.send(JSON.stringify({ name, msg }));
+      });
     </script>
   </body>
 </html>

@@ -1,16 +1,29 @@
-import { WebSocket } from "https://deno.land/std/ws/mod.ts";
-import { v4 } from "https://deno.land/std/uuid/mod.ts";
+import {
+  WebSocket,
+  isWebSocketCloseEvent,
+} from "https://deno.land/std/ws/mod.ts";
 
 const uuidToWS = new Map<string, WebSocket>();
 
-const chatConnection = (ws: WebSocket) => {
-  console.log("new socket connection");
-
+const chatConnection = async (ws: WebSocket) => {
   // to add new websocket connection to the map
-  const uuid = v4.generate();
+  const uuid = crypto.randomUUID();
   uuidToWS.set(uuid, ws);
 
-  console.log(uuidToWS);
+  for await (const ev of ws) {
+    console.log(ev);
+
+    // to delete the websocket if the connection is closed
+    if (isWebSocketCloseEvent(ev)) {
+      uuidToWS.delete(uuid);
+    }
+
+    // to create the event object if the event is of type string
+    if (typeof ev === "string") {
+      let evObj = JSON.parse(ev);
+      console.log(evObj);
+    }
+  }
 };
 
 export { chatConnection };
